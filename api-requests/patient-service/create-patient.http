@@ -3,7 +3,7 @@ POST http://localhost:4000/patients
 Content-Type: application/json
 
 {
-  "name": "John Doe Kafka Test",
+  "name": "John Doe",
   "email": "kafka_test11@example.com",
   "address": "123 main street22",
   "dateOfBirth": "1995-09-09",
