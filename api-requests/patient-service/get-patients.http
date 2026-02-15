@@ -1,4 +1,13 @@
-### GET request to get all patients
-GET http://localhost:4004/api/patients
+### Get OAuth2 Access Token from Keycloak
+POST http://localhost:8080/realms/patient-management/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
 
-###
+grant_type=client_credentials&client_id=ms-api&client_secret=VnNPGE8tHJ5sMjaDAw6gaMJNS7KDBrGf
+
+> {%
+    client.global.set("access_token", response.body.access_token);
+%}
+
+### GET request to get all patients (with authentication)
+GET http://localhost:4004/api/patients
+Authorization: Bearer {{access_token}}
