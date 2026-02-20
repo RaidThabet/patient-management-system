@@ -1,13 +1,13 @@
 ### Get OAuth2 Access Token from Keycloak
-POST http://localhost:8080/realms/patient-management/protocol/openid-connect/token
+POST http://lb-c208c37d.elb.localhost.localstack.cloud:8080/realms/patient-management/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
-grant_type=client_credentials&client_id=ms-api&client_secret=VnNPGE8tHJ5sMjaDAw6gaMJNS7KDBrGf
+grant_type=client_credentials&client_id=ms-api&client_secret=GWCBFYcTMNbQT9cPxx5zKtqvQX3d0pFr
 
 > {%
     client.global.set("access_token", response.body.access_token);
 %}
 
 ### GET request to get all patients (with authentication)
-GET http://localhost:4004/api/patients
+GET http://lb-b9768355.elb.localhost.localstack.cloud:4004/api/patients
 Authorization: Bearer {{access_token}}
