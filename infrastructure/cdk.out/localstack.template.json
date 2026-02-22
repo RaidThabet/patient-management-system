@@ -702,16 +702,24 @@
       ],
       "Environment": [
        {
-        "Name": "KC_DB",
-        "Value": "postgres"
+        "Name": "KC_BOOTSTRAP_ADMIN_PASSWORD",
+        "Value": "admin"
        },
        {
         "Name": "KC_BOOTSTRAP_ADMIN_USERNAME",
         "Value": "admin"
        },
        {
-        "Name": "KC_BOOTSTRAP_ADMIN_PASSWORD",
-        "Value": "admin"
+        "Name": "KC_DB",
+        "Value": "postgres"
+       },
+       {
+        "Name": "KC_HOSTNAME_STRICT",
+        "Value": "false"
+       },
+       {
+        "Name": "KC_HOSTNAME",
+        "Value": "http://host.docker.internal:8080"
        },
        {
         "Name": "KC_DB_USERNAME",
@@ -741,10 +749,6 @@
           ]
          ]
         }
-       },
-       {
-        "Name": "KC_HOSTNAME",
-        "Value": "http://keycloak-service.patient-management.local:8080"
        }
       ],
       "Essential": true,
@@ -873,154 +877,7 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete"
   },
-  "KeycloakServiceLBDA20ED16": {
-   "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
-   "Properties": {
-    "LoadBalancerAttributes": [
-     {
-      "Key": "deletion_protection.enabled",
-      "Value": "false"
-     }
-    ],
-    "Scheme": "internet-facing",
-    "SecurityGroups": [
-     {
-      "Fn::GetAtt": [
-       "KeycloakServiceLBSecurityGroupF2682F29",
-       "GroupId"
-      ]
-     }
-    ],
-    "Subnets": [
-     {
-      "Ref": "PatientManagementVPCPublicSubnet1SubnetC8305E9D"
-     },
-     {
-      "Ref": "PatientManagementVPCPublicSubnet2Subnet07CEC558"
-     }
-    ],
-    "Type": "application"
-   },
-   "DependsOn": [
-    "KeycloakDBEED70943",
-    "KeycloakDBSecretAttachmentB18B52FD",
-    "localstackKeycloakDBSecretC130255C3fdaad7efa858a3daf9490cf0a702aeb",
-    "KeycloakDBSecurityGroup23DE80E6",
-    "KeycloakDBSubnetGroup94CB4BCE",
-    "KeycloakDBHealthCheck",
-    "PatientManagementVPCPublicSubnet1DefaultRoute1E407ABB",
-    "PatientManagementVPCPublicSubnet1RouteTableAssociationA39A24A4",
-    "PatientManagementVPCPublicSubnet2DefaultRoute2DC1F916",
-    "PatientManagementVPCPublicSubnet2RouteTableAssociationCAC8BA09"
-   ]
-  },
-  "KeycloakServiceLBSecurityGroupF2682F29": {
-   "Type": "AWS::EC2::SecurityGroup",
-   "Properties": {
-    "GroupDescription": "Automatically created Security Group for ELB localstackKeycloakServiceLB6F8659B5",
-    "SecurityGroupIngress": [
-     {
-      "CidrIp": "0.0.0.0/0",
-      "Description": "Allow from anyone on port 8080",
-      "FromPort": 8080,
-      "IpProtocol": "tcp",
-      "ToPort": 8080
-     }
-    ],
-    "VpcId": {
-     "Ref": "PatientManagementVPC522067E7"
-    }
-   },
-   "DependsOn": [
-    "KeycloakDBEED70943",
-    "KeycloakDBSecretAttachmentB18B52FD",
-    "localstackKeycloakDBSecretC130255C3fdaad7efa858a3daf9490cf0a702aeb",
-    "KeycloakDBSecurityGroup23DE80E6",
-    "KeycloakDBSubnetGroup94CB4BCE",
-    "KeycloakDBHealthCheck"
-   ]
-  },
-  "KeycloakServiceLBSecurityGrouptolocalstackKeycloakServiceSecurityGroupA8634AAF8080807BEF5E": {
-   "Type": "AWS::EC2::SecurityGroupEgress",
-   "Properties": {
-    "Description": "Load balancer to target",
-    "DestinationSecurityGroupId": {
-     "Fn::GetAtt": [
-      "KeycloakServiceSecurityGroupEEE9A853",
-      "GroupId"
-     ]
-    },
-    "FromPort": 8080,
-    "GroupId": {
-     "Fn::GetAtt": [
-      "KeycloakServiceLBSecurityGroupF2682F29",
-      "GroupId"
-     ]
-    },
-    "IpProtocol": "tcp",
-    "ToPort": 8080
-   },
-   "DependsOn": [
-    "KeycloakDBEED70943",
-    "KeycloakDBSecretAttachmentB18B52FD",
-    "localstackKeycloakDBSecretC130255C3fdaad7efa858a3daf9490cf0a702aeb",
-    "KeycloakDBSecurityGroup23DE80E6",
-    "KeycloakDBSubnetGroup94CB4BCE",
-    "KeycloakDBHealthCheck"
-   ]
-  },
-  "KeycloakServiceLBPublicListenerF1BD9FFE": {
-   "Type": "AWS::ElasticLoadBalancingV2::Listener",
-   "Properties": {
-    "DefaultActions": [
-     {
-      "TargetGroupArn": {
-       "Ref": "KeycloakServiceLBPublicListenerECSGroup7008E672"
-      },
-      "Type": "forward"
-     }
-    ],
-    "LoadBalancerArn": {
-     "Ref": "KeycloakServiceLBDA20ED16"
-    },
-    "Port": 8080,
-    "Protocol": "HTTP"
-   },
-   "DependsOn": [
-    "KeycloakDBEED70943",
-    "KeycloakDBSecretAttachmentB18B52FD",
-    "localstackKeycloakDBSecretC130255C3fdaad7efa858a3daf9490cf0a702aeb",
-    "KeycloakDBSecurityGroup23DE80E6",
-    "KeycloakDBSubnetGroup94CB4BCE",
-    "KeycloakDBHealthCheck"
-   ]
-  },
-  "KeycloakServiceLBPublicListenerECSGroup7008E672": {
-   "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
-   "Properties": {
-    "Port": 80,
-    "Protocol": "HTTP",
-    "TargetGroupAttributes": [
-     {
-      "Key": "stickiness.enabled",
-      "Value": "false"
-     }
-    ],
-    "TargetType": "ip",
-    "VpcId": {
-     "Ref": "PatientManagementVPC522067E7"
-    }
-   },
-   "DependsOn": [
-    "KeycloakDBEED70943",
-    "KeycloakDBSecretAttachmentB18B52FD",
-    "localstackKeycloakDBSecretC130255C3fdaad7efa858a3daf9490cf0a702aeb",
-    "KeycloakDBSecurityGroup23DE80E6",
-    "KeycloakDBSubnetGroup94CB4BCE",
-    "KeycloakDBHealthCheck"
-   ]
-  },
-  "KeycloakService002681F6": {
+  "KeycloakService57DCE7E4": {
    "Type": "AWS::ECS::Service",
    "Properties": {
     "Cluster": {
@@ -1037,34 +894,24 @@
     },
     "DesiredCount": 1,
     "EnableECSManagedTags": false,
-    "HealthCheckGracePeriodSeconds": 60,
     "LaunchType": "FARGATE",
-    "LoadBalancers": [
-     {
-      "ContainerName": "KeycloakContainer",
-      "ContainerPort": 8080,
-      "TargetGroupArn": {
-       "Ref": "KeycloakServiceLBPublicListenerECSGroup7008E672"
-      }
-     }
-    ],
     "NetworkConfiguration": {
      "AwsvpcConfiguration": {
-      "AssignPublicIp": "DISABLED",
+      "AssignPublicIp": "ENABLED",
       "SecurityGroups": [
        {
         "Fn::GetAtt": [
-         "KeycloakServiceSecurityGroupEEE9A853",
+         "KeycloakServiceSecurityGroup292AF21C",
          "GroupId"
         ]
        }
       ],
       "Subnets": [
        {
-        "Ref": "PatientManagementVPCPrivateSubnet1Subnet05B10E79"
+        "Ref": "PatientManagementVPCPublicSubnet1SubnetC8305E9D"
        },
        {
-        "Ref": "PatientManagementVPCPrivateSubnet2Subnet8A2E409C"
+        "Ref": "PatientManagementVPCPublicSubnet2Subnet07CEC558"
        }
       ]
      }
@@ -1081,15 +928,13 @@
     "KeycloakDBSecurityGroup23DE80E6",
     "KeycloakDBSubnetGroup94CB4BCE",
     "KeycloakDBHealthCheck",
-    "KeycloakServiceLBPublicListenerECSGroup7008E672",
-    "KeycloakServiceLBPublicListenerF1BD9FFE",
     "KeycloakTaskDefinitionTaskRole891F91AA"
    ]
   },
-  "KeycloakServiceSecurityGroupEEE9A853": {
+  "KeycloakServiceSecurityGroup292AF21C": {
    "Type": "AWS::EC2::SecurityGroup",
    "Properties": {
-    "GroupDescription": "localstack/KeycloakService/Service/SecurityGroup",
+    "GroupDescription": "localstack/KeycloakService/SecurityGroup",
     "SecurityGroupEgress": [
      {
       "CidrIp": "0.0.0.0/0",
@@ -1100,66 +945,6 @@
     "VpcId": {
      "Ref": "PatientManagementVPC522067E7"
     }
-   },
-   "DependsOn": [
-    "KeycloakDBEED70943",
-    "KeycloakDBSecretAttachmentB18B52FD",
-    "localstackKeycloakDBSecretC130255C3fdaad7efa858a3daf9490cf0a702aeb",
-    "KeycloakDBSecurityGroup23DE80E6",
-    "KeycloakDBSubnetGroup94CB4BCE",
-    "KeycloakDBHealthCheck",
-    "KeycloakTaskDefinitionTaskRole891F91AA"
-   ]
-  },
-  "KeycloakServiceSecurityGroupfromlocalstackKeycloakServiceLBSecurityGroupF0279CBB80809D60717F": {
-   "Type": "AWS::EC2::SecurityGroupIngress",
-   "Properties": {
-    "Description": "Load balancer to target",
-    "FromPort": 8080,
-    "GroupId": {
-     "Fn::GetAtt": [
-      "KeycloakServiceSecurityGroupEEE9A853",
-      "GroupId"
-     ]
-    },
-    "IpProtocol": "tcp",
-    "SourceSecurityGroupId": {
-     "Fn::GetAtt": [
-      "KeycloakServiceLBSecurityGroupF2682F29",
-      "GroupId"
-     ]
-    },
-    "ToPort": 8080
-   },
-   "DependsOn": [
-    "KeycloakDBEED70943",
-    "KeycloakDBSecretAttachmentB18B52FD",
-    "localstackKeycloakDBSecretC130255C3fdaad7efa858a3daf9490cf0a702aeb",
-    "KeycloakDBSecurityGroup23DE80E6",
-    "KeycloakDBSubnetGroup94CB4BCE",
-    "KeycloakDBHealthCheck",
-    "KeycloakTaskDefinitionTaskRole891F91AA"
-   ]
-  },
-  "KeycloakServiceSecurityGroupfromlocalstackApiGatewayServiceSecurityGroup47EA876B8080CB2B2274": {
-   "Type": "AWS::EC2::SecurityGroupIngress",
-   "Properties": {
-    "Description": "Allow API Gateway SG to connect to Keycloak",
-    "FromPort": 8080,
-    "GroupId": {
-     "Fn::GetAtt": [
-      "KeycloakServiceSecurityGroupEEE9A853",
-      "GroupId"
-     ]
-    },
-    "IpProtocol": "tcp",
-    "SourceSecurityGroupId": {
-     "Fn::GetAtt": [
-      "ApiGatewayServiceSecurityGroup867C9DB1",
-      "GroupId"
-     ]
-    },
-    "ToPort": 8080
    },
    "DependsOn": [
     "KeycloakDBEED70943",
@@ -1866,10 +1651,6 @@
      {
       "Environment": [
        {
-        "Name": "SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI",
-        "Value": "http://keycloak-service.patient-management.local:8080/realms/patient-management"
-       },
-       {
         "Name": "SPRING_PROFILES_ACTIVE",
         "Value": "prod"
        }
@@ -2188,30 +1969,6 @@
   }
  },
  "Outputs": {
-  "KeycloakServiceLoadBalancerDNSCC22036B": {
-   "Value": {
-    "Fn::GetAtt": [
-     "KeycloakServiceLBDA20ED16",
-     "DNSName"
-    ]
-   }
-  },
-  "KeycloakServiceServiceURL69883E97": {
-   "Value": {
-    "Fn::Join": [
-     "",
-     [
-      "http://",
-      {
-       "Fn::GetAtt": [
-        "KeycloakServiceLBDA20ED16",
-        "DNSName"
-       ]
-      }
-     ]
-    ]
-   }
-  },
   "ApiGatewayServiceLoadBalancerDNS40D66446": {
    "Value": {
     "Fn::GetAtt": [

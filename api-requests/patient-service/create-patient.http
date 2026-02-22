@@ -1,15 +1,15 @@
 ### Get OAuth2 Access Token from Keycloak
-POST http://lb-9e73af7a.elb.localhost.localstack.cloud:54479/realms/patient-management/protocol/openid-connect/token
+POST http://lb-e9f1edca.elb.localhost.localstack.cloud:8080/realms/patient-management/protocol/openid-connect/token
 Content-Type: application/x-www-form-urlencoded
 
-grant_type=client_credentials&client_id=postman-client&client_secret=mzNDzhHCdVYE91xvJJh4wM3vKXAuG8lR
+grant_type=client_credentials&client_id=ms-api&client_secret=s3aOjP7nk9pmJapIgMAIuFJmzyhgqxOm
 
 > {%
     client.global.set("access_token", response.body.access_token);
 %}
 
 ### Creates a new patient entity
-POST http://lb-9e73af7a.elb.localhost.localstack.cloud:4004/api/patients
+POST http://lb-e9f1edca.elb.localhost.localstack.cloud:4004/api/patients
 Authorization: Bearer {{access_token}}
 Content-Type: application/json
 

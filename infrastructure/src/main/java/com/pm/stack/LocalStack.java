@@ -1,6 +1,5 @@
 package com.pm.stack;
 
-import com.amazonaws.services.kafka.model.KafkaVersion;
 import software.amazon.awscdk.*;
 import software.amazon.awscdk.services.ec2.*;
 import software.amazon.awscdk.services.ec2.InstanceType;
@@ -143,7 +142,7 @@ public class LocalStack extends Stack {
                 .build();
     }
 
-    // example: keycloak.patient-management.local or patient-service.patient-management.local
+    // example: keycloak-service.patient-management.local or patient-service.patient-management.local
     private Cluster createEcsCluster() {
         return Cluster.Builder
                 .create(this, "PatientManagementCluster")
@@ -192,8 +191,8 @@ public class LocalStack extends Stack {
                                 ),
                                 "KC_DB_USERNAME", "admin_user",
 //                                "KC_HTTP_ENABLED", "true",
-                                "KC_HOSTNAME", "http://keycloak-service.patient-management.local:8080"
-//                                "KC_HOSTNAME_STRICT", "false"
+                                "KC_HOSTNAME", "http://host.docker.internal:8080",
+                                "KC_HOSTNAME_STRICT", "false"
                         ))
                         .secrets(Map.of(
                                 "KC_DB_PASSWORD",
@@ -214,6 +213,11 @@ public class LocalStack extends Stack {
                 .serviceName("keycloak-service")
                 .assignPublicIp(true) // important for LocalStack unless NAT configured
                 .desiredCount(1)
+//                .cloudMapOptions(CloudMapOptions.builder()
+//                        .name("keycloak-service")
+//                        .containerPort(8080)
+//                        .build()
+//                )
                 .build();
     }
 
@@ -295,8 +299,9 @@ public class LocalStack extends Stack {
         ContainerDefinitionOptions containerOptions = ContainerDefinitionOptions.builder()
                 .image(ContainerImage.fromRegistry("api-gateway")) // In real production use ECR or DockerHub, for localstack we can use local images
                 .environment(Map.of(
-                        "SPRING_PROFILES_ACTIVE", "prod",
-                        "SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI", "http://keycloak-service.patient-management.local:8080/realms/patient-management"
+                        "SPRING_PROFILES_ACTIVE", "prod"
+//                        "SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI", "http://keycloak-service.patient-management.local:8080/realms/patient-management",
+//                        "SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI", "http://keycloak-service.patient-management.local:8080/realms/patient-management/protocol/openid-connect/certs"
                 ))
                 .portMappings(List.of(4004).stream()
                         .map(port -> PortMapping.builder()
